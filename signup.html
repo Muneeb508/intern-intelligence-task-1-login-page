@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <form id="signupForm" class="login-box">
+      <h2>Sign Up</h2>
+
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input type="email" id="signupEmail" required />
+        <small class="error" id="signupEmailError"></small>
+      </div>
+
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="signupPassword" required />
+        <small class="error" id="signupPasswordError"></small>
+      </div>
+
+      <button type="submit" class="btn">Create Account</button>
+
+      <p class="signup-text">
+        Already have an account? <a href="index.html" class="link">Login</a>
+      </p>
+    </form>
+  </div>
+
+  <!-- Firebase SDK & Signup Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    // ✅ Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlSgVufNHn0ajgw9F3bVmDT2jfFfTcedk",
+      authDomain: "login-ebc8b.firebaseapp.com",
+      projectId: "login-ebc8b",
+      storageBucket: "login-ebc8b.appspot.com",
+      messagingSenderId: "850526933766",
+      appId: "1:850526933766:web:a1f8873214cb58e0cf4487",
+    };
+
+    // ✅ Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // ✅ Handle Signup
+    const signupForm = document.getElementById("signupForm");
+    signupForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+      const emailError = document.getElementById("signupEmailError");
+      const passwordError = document.getElementById("signupPasswordError");
+
+      emailError.textContent = "";
+      passwordError.textContent = "";
+
+      if (!email.includes("@")) {
+        emailError.textContent = "Invalid email.";
+        return;
+      }
+
+      if (password.length < 6) {
+        passwordError.textContent = "At least 6 characters.";
+        return;
+      }
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          console.log("User signed up:", userCredential.user);
+          alert("Signup successful!");
+          signupForm.reset();
+        })
+        .catch((error) => {
+          console.error("Signup error:", error.message);
+          if (error.code === "auth/email-already-in-use") {
+            emailError.textContent = "Email already in use.";
+          } else {
+            alert("Signup failed: " + error.message);
+          }
+        });
+    });
+  </script>
+</body>
+</html>
